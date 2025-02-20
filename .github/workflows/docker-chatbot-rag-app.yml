@@ -46,9 +46,11 @@ jobs:
         id: build
         with:
           context: example-apps/chatbot-rag-app
-          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=${{ github.event_name == 'push' && 'true' || 'false' }}
+          tags: ${{ github.event_name == 'pull_request' && 'chatbot-rag-app:rag' || null }}
+          outputs: type=${{ github.event_name == 'pull_request' && 'docker' || 'image' }},name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=${{ github.event_name == 'push' && 'true' || 'false' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - run: docker run --rm chatbot-rag-app:rag
       - name: export digest
         if: github.event_name == 'push'
         run: |
